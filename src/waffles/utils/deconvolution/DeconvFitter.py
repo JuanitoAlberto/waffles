@@ -131,7 +131,8 @@ class DeconvFitter(FFTWaffles):
                  fit_limits_ns: list = [None, 8.e3],
                  force_range: bool = False,
                  tolerance: float = 2e-2,
-                 init: FitInitParams = FitInitParams()
+                 init: FitInitParams = FitInitParams(),
+                 fixed_tau_fast_ns: float | None = None
                  ):
 
 
@@ -165,13 +166,17 @@ class DeconvFitter(FFTWaffles):
             if oneexp:
                 init = FitInitParams.for_lar_oneexp()
 
+        if fixed_tau_fast_ns is not None and fixed_tau_fast_ns <= 0:
+            raise ValueError("fixed_tau_fast_ns must be positive when provided.")
+
         if self.scinttype == 'lar':
             self.model = self.model_lar
             mcost = cost.LeastSquares(times, signal_to_fit, errors, self.model)
             
             A = init.A
             fp = init.fp
-            t1 = init.t1
+            # Si se indica fixed_tau_fast_ns, t1 queda fijada a ese valor durante todo el ajuste.
+            t1 = fixed_tau_fast_ns if fixed_tau_fast_ns is not None else init.t1
             t3 = init.t3
             sigma = init.sigma
 
@@ -185,6 +190,8 @@ class DeconvFitter(FFTWaffles):
             m.limits['t0'] = (t0_init-100, nticks * self.dtime)
 
             m.fixed['fp'] = True
+            if fixed_tau_fast_ns is not None:
+                m.fixed['t1'] = True
             m.migrad()
             m.migrad()
             m.migrad()
@@ -201,7 +208,8 @@ class DeconvFitter(FFTWaffles):
             A = init.A
             fp = init.fp
             fs_frac_init = init.fs_frac
-            t1 = init.t1
+            # Si se indica fixed_tau_fast_ns, t1 queda fijada a ese valor durante todo el ajuste.
+            t1 = fixed_tau_fast_ns if fixed_tau_fast_ns is not None else init.t1
             t3 = init.t3
             td = init.td
             sigma = init.sigma
@@ -228,7 +236,11 @@ class DeconvFitter(FFTWaffles):
             m.migrad()
             m.fixed['fp'] = False
             m.fixed['fs_frac'] = False
-            m.fixed['t1'] = False
+            if fixed_tau_fast_ns is None:
+                m.fixed['t1'] = False
+            else:
+                m.values['t1'] = fixed_tau_fast_ns
+                m.fixed['t1'] = True
             m.fixed['t3'] = False
             m.fixed['td'] = False
             m.migrad()

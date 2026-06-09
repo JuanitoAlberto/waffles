@@ -64,6 +64,7 @@ class FitInitParams:
     @classmethod
     def for_larxe(cls) -> "FitInitParams":
         return cls(fp=0.2, t1=25.0,
+                   t3=3200.0, td=600.0,
                    fs_frac=0.7 / (1 - 0.2), initialized=True)
 
     @classmethod
