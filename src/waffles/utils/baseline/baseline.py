@@ -148,6 +148,15 @@ class SBaseline:
         self.filtering = self.data_base[ep][ch]['baseline'].get('default_filtering', self.filtering)
 
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        del state['denoiser']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self.denoiser = Denoise()
+
     def __repr__(self):
         return (
             f"SBaseline(\n"
