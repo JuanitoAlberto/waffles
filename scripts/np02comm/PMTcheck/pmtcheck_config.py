@@ -65,7 +65,7 @@ QTOTAL_NS = 1300.0                   # Integral total/lenta desde el inicio del 
 
 AVG_PEAK_SEARCH_WINDOW = slice(60, 100)  # Ventana del pico para alinear antes de promediar.
 
-# --- Geometria del detector (endpoint 110) --------------------------------------
+# --- Código de los PMTs en el detector (endpoint 110) --------------------------------------
 
 ENDPOINT = 110
 
