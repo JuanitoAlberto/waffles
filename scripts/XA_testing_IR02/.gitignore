@@ -1,0 +1,4 @@
+# Cache local de WaveformSet y bytecode
+cache/
+__pycache__/
+*.pyc
